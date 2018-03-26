@@ -1,0 +1,41 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+BATCH_SIZE	LeNet5_train.py	/^BATCH_SIZE = 100$/;"	v
+BATCH_SIZE	mnist_train.py	/^BATCH_SIZE = 100 $/;"	v
+CONV1_DEEP	LeNet5_infernece.py	/^CONV1_DEEP = 32$/;"	v
+CONV1_SIZE	LeNet5_infernece.py	/^CONV1_SIZE = 5$/;"	v
+CONV2_DEEP	LeNet5_infernece.py	/^CONV2_DEEP = 64$/;"	v
+CONV2_SIZE	LeNet5_infernece.py	/^CONV2_SIZE = 5$/;"	v
+EVAL_INTERVAL_SECS	mnist_eval.py	/^EVAL_INTERVAL_SECS = 10$/;"	v
+FC_SIZE	LeNet5_infernece.py	/^FC_SIZE = 512$/;"	v
+IMAGE_SIZE	LeNet5_infernece.py	/^IMAGE_SIZE = 28$/;"	v
+INPUT_NODE	LeNet5_infernece.py	/^INPUT_NODE = 784$/;"	v
+LEARNING_RATE_BASE	LeNet5_train.py	/^LEARNING_RATE_BASE = 0.01$/;"	v
+LEARNING_RATE_BASE	mnist_train.py	/^LEARNING_RATE_BASE = 0.8$/;"	v
+LEARNING_RATE_DECAY	LeNet5_train.py	/^LEARNING_RATE_DECAY = 0.99$/;"	v
+LEARNING_RATE_DECAY	mnist_train.py	/^LEARNING_RATE_DECAY = 0.99$/;"	v
+MODEL_NAME	LeNet5_train.py	/^MODEL_NAME = "LeNet5_model"$/;"	v
+MODEL_NAME	mnist_train.py	/^MODEL_NAME = "mnist_model"$/;"	v
+MODEL_SAVE_PATH	LeNet5_train.py	/^MODEL_SAVE_PATH = "LeNet5_model\/"$/;"	v
+MODEL_SAVE_PATH	mnist_train.py	/^MODEL_SAVE_PATH = "MNIST_model\/"$/;"	v
+MOVING_AVERAGE_DECAY	LeNet5_train.py	/^MOVING_AVERAGE_DECAY = 0.99$/;"	v
+MOVING_AVERAGE_DECAY	mnist_train.py	/^MOVING_AVERAGE_DECAY = 0.99 $/;"	v
+NUM_CHANNELS	LeNet5_infernece.py	/^NUM_CHANNELS = 1$/;"	v
+NUM_LABELS	LeNet5_infernece.py	/^NUM_LABELS = 10$/;"	v
+OUTPUT_NODE	LeNet5_infernece.py	/^OUTPUT_NODE = 10$/;"	v
+REGULARIZATION_RATE	LeNet5_train.py	/^REGULARIZATION_RATE = 0.0001$/;"	v
+REGULARIZATION_RATE	mnist_train.py	/^REGULARIZATION_RATE = 0.0001$/;"	v
+TRAINING_STEPS	LeNet5_train.py	/^TRAINING_STEPS = 60$/;"	v
+TRAINING_STEPS	mnist_train.py	/^TRAINING_STEPS = 30000$/;"	v
+evaluate	LeNet5_train.py	/^def evaluate(mnist):$/;"	f
+evaluate	mnist_eval.py	/^def evaluate(mnist):$/;"	f
+inference	LeNet5_infernece.py	/^def inference(input_tensor, train, regularizer):$/;"	f
+main	LeNet5_train.py	/^def main(argv):$/;"	f
+main	mnist_eval.py	/^def main(argv=None):$/;"	f
+main	mnist_train.py	/^def main(argv=None):$/;"	f
+train	LeNet5_train.py	/^def train(mnist):$/;"	f
+train	mnist_train.py	/^def train(mnist):$/;"	f
