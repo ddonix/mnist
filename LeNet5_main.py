@@ -21,7 +21,6 @@ BATCH_SIZE = 100
 LEARNING_RATE_BASE = 0.01
 LEARNING_RATE_DECAY = 0.99
 REGULARIZATION_RATE = 0.0001
-TRAINING_STEPS = 100
 MOVING_AVERAGE_DECAY = 0.99
 MODEL_SAVE_PATH = "LeNet5_model/"
 MODEL_NAME = "LeNet5_model"
@@ -32,7 +31,7 @@ MODEL_NAME = "LeNet5_model"
 # In[3]:
 
 
-def train(mnist):
+def train(mnist, training_steps):
     # 定义输出为4维矩阵的placeholder
     x = tf.placeholder(tf.float32, [
             BATCH_SIZE,
@@ -65,20 +64,24 @@ def train(mnist):
     # 初始化TensorFlow持久化类。
     saver = tf.train.Saver()
     with tf.Session() as sess:
-        tf.global_variables_initializer().run()
-        for i in range(TRAINING_STEPS):
-            xs, ys = mnist.train.next_batch(BATCH_SIZE)
-
-            reshaped_xs = np.reshape(xs, (
-                BATCH_SIZE,
-                LeNet5_infernece.IMAGE_SIZE,
-                LeNet5_infernece.IMAGE_SIZE,
-                LeNet5_infernece.NUM_CHANNELS))
-            _, loss_value, step = sess.run([train_op, loss, global_step], feed_dict={x: reshaped_xs, y_: ys})
-
-            if i % 10 == 0:
-                print("After %d training step(s), loss on training batch is %g." % (step, loss_value))
-                saver.save(sess, os.path.join(MODEL_SAVE_PATH, MODEL_NAME), global_step=global_step)
+		tf.global_variables_initializer().run()
+		ckpt = tf.train.get_checkpoint_state(MODEL_SAVE_PATH)
+		if ckpt and ckpt.model_checkpoint_path:
+			print("!!!!!!!!")
+		else:
+			print("FFFFFFFFF")
+        
+		for i in range(training_steps):
+			for j in range(10):
+				xs, ys = mnist.train.next_batch(BATCH_SIZE)
+				reshaped_xs = np.reshape(xs, (
+					BATCH_SIZE,
+					LeNet5_infernece.IMAGE_SIZE,
+					LeNet5_infernece.IMAGE_SIZE,
+					LeNet5_infernece.NUM_CHANNELS))
+				_, loss_value, step = sess.run([train_op, loss, global_step], feed_dict={x: reshaped_xs, y_: ys})
+			print("After %d training step(s), loss on training batch is %g." % (step, loss_value))
+			saver.save(sess, os.path.join(MODEL_SAVE_PATH, MODEL_NAME), global_step=global_step)
 
 # #### 3. 定义验证过程
 def evaluate(mnist):
@@ -122,7 +125,7 @@ def evaluate(mnist):
 def main(argv):
 	if argv == 'train':
 		mnist = input_data.read_data_sets("./datasets/MNIST_data", one_hot=True)
-		train(mnist)
+		train(mnist, 10)
 	elif argv == 'eval':
 		mnist = input_data.read_data_sets("./datasets/MNIST_data", one_hot=True)
 		evaluate(mnist)
