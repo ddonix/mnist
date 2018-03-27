@@ -100,12 +100,18 @@ def evaluate(mnist):
 			if ckpt and ckpt.model_checkpoint_path:
 				saver.restore(sess, ckpt.model_checkpoint_path)
 				global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
-				xs = mnist.validation.images[0:500]
-				ys = mnist.validation.labels[0:500]
-				reshaped_xs = np.reshape(xs, (500, LeNet5_infernece.IMAGE_SIZE, LeNet5_infernece.IMAGE_SIZE, LeNet5_infernece.NUM_CHANNELS))
-				validate_feed = {x: reshaped_xs, y_: ys}
-				accuracy_score = sess.run(accuracy, feed_dict=validate_feed)
-				print("validation accuracy = %g"%accuracy_score)
+				index = 0
+				accu = []
+				while index < 5000:
+					xs = mnist.validation.images[index:index+500]
+					ys = mnist.validation.labels[index:index+500]
+					index +=500
+					reshaped_xs = np.reshape(xs, (500, LeNet5_infernece.IMAGE_SIZE, LeNet5_infernece.IMAGE_SIZE, LeNet5_infernece.NUM_CHANNELS))
+					validate_feed = {x: reshaped_xs, y_: ys}
+					accuracy_score = sess.run(accuracy, feed_dict=validate_feed)
+					accu.append(accuracy_score)
+					print("validation accuracy = %g"%accuracy_score)
+				print("validation mean accuracy = %g"%np.mean(accu))
 			else:
 				print("no checkpoint")
 # #### 4. 主程序入口
