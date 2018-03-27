@@ -1,0 +1,6 @@
+model_checkpoint_path: "LeNet5_model-51"
+all_model_checkpoint_paths: "LeNet5_model-11"
+all_model_checkpoint_paths: "LeNet5_model-21"
+all_model_checkpoint_paths: "LeNet5_model-31"
+all_model_checkpoint_paths: "LeNet5_model-41"
+all_model_checkpoint_paths: "LeNet5_model-51"

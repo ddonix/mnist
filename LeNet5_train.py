@@ -84,21 +84,12 @@ def train(mnist):
 def evaluate(mnist):
     with tf.Graph().as_default() as g:
 		x = tf.placeholder(tf.float32, 
-				[5000, 
+				[500, 
 				LeNet5_infernece.IMAGE_SIZE, 
 				LeNet5_infernece.IMAGE_SIZE, 
 				LeNet5_infernece.NUM_CHANNELS], 
 				name='x-input')
 		y_ = tf.placeholder(tf.float32, [None, LeNet5_infernece.OUTPUT_NODE], name='y-input')
-		xs = mnist.validation.images
-		ys = mnist.validation.labels
-		reshaped_xs = np.reshape(xs, (
-        			5000,
-                	LeNet5_infernece.IMAGE_SIZE,
-                	LeNet5_infernece.IMAGE_SIZE,
-                	LeNet5_infernece.NUM_CHANNELS))
-
-		validate_feed = {x: reshaped_xs, y_: ys}
 				
 		y = LeNet5_infernece.inference(x, False, None)
 		correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
@@ -109,10 +100,14 @@ def evaluate(mnist):
 			if ckpt and ckpt.model_checkpoint_path:
 				saver.restore(sess, ckpt.model_checkpoint_path)
 				global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
+				xs = mnist.validation.images[0:500]
+				ys = mnist.validation.labels[0:500]
+				reshaped_xs = np.reshape(xs, (500, LeNet5_infernece.IMAGE_SIZE, LeNet5_infernece.IMAGE_SIZE, LeNet5_infernece.NUM_CHANNELS))
+				validate_feed = {x: reshaped_xs, y_: ys}
 				accuracy_score = sess.run(accuracy, feed_dict=validate_feed)
 				print("validation accuracy = %g"%accuracy_score)
 			else:
-				print('No checkpoint file found')
+				print("no checkpoint")
 # #### 4. 主程序入口
 
 # In[5]:
@@ -120,10 +115,10 @@ def evaluate(mnist):
 
 def main(argv):
 	if argv == 'train':
-		mnist = input_data.read_data_sets("../../../datasets/MNIST_data", one_hot=True)
+		mnist = input_data.read_data_sets("./datasets/MNIST_data", one_hot=True)
 		train(mnist)
 	elif argv == 'eval':
-		mnist = input_data.read_data_sets("../../../datasets/MNIST_data", one_hot=True)
+		mnist = input_data.read_data_sets("./datasets/MNIST_data", one_hot=True)
 		evaluate(mnist)
 	else:
 		print("train or eval")
