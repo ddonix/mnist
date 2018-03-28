@@ -64,12 +64,11 @@ def train(mnist, training_steps):
     # 初始化TensorFlow持久化类。
     saver = tf.train.Saver()
     with tf.Session() as sess:
-		tf.global_variables_initializer().run()
 		ckpt = tf.train.get_checkpoint_state(MODEL_SAVE_PATH)
 		if ckpt and ckpt.model_checkpoint_path:
-			print("!!!!!!!!")
+			saver.restore(sess, ckpt.model_checkpoint_path)
 		else:
-			print("FFFFFFFFF")
+			tf.global_variables_initializer().run()
         
 		for i in range(training_steps):
 			for j in range(10):
@@ -122,18 +121,24 @@ def evaluate(mnist):
 # In[5]:
 
 
-def main(argv):
+def main(argv,argv2):
 	if argv == 'train':
-		mnist = input_data.read_data_sets("./datasets/MNIST_data", one_hot=True)
-		train(mnist, 10)
+		mnist = input_data.read_data_sets("../datasets/MNIST_data", one_hot=True)
+		train(mnist, argv2)
 	elif argv == 'eval':
-		mnist = input_data.read_data_sets("./datasets/MNIST_data", one_hot=True)
+		mnist = input_data.read_data_sets("../datasets/MNIST_data", one_hot=True)
 		evaluate(mnist)
 	else:
 		print("train or eval")
 
 if __name__ == '__main__':
-	if len(sys.argv) != 2:
+	if len(sys.argv) < 2:
 		print("train or eval")
+	
+	if sys.argv[1] == 'train':
+		steps = 10
+		if len(sys.argv) > 2:
+			steps = int(sys.argv[2])
+		main(sys.argv[1], steps)
 	else:
-		main(sys.argv[1])
+		main(sys.argv[1], None)
