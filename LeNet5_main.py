@@ -116,29 +116,48 @@ def evaluate(mnist):
 				print("validation mean accuracy = %g"%np.mean(accu))
 			else:
 				print("no checkpoint")
-# #### 4. 主程序入口
 
 # In[5]:
+def prediction(filename):
+    with tf.Graph().as_default() as g:
+		x = tf.placeholder(tf.float32, 
+				[1, 
+				LeNet5_infernece.IMAGE_SIZE, 
+				LeNet5_infernece.IMAGE_SIZE, 
+				LeNet5_infernece.NUM_CHANNELS], 
+				name='x-input')
+				
+		y = LeNet5_infernece.inference(x, False, None)
+		prediction = tf.argmax(y, 1)
+		saver = tf.train.Saver()
+		with tf.Session() as sess:
+			ckpt = tf.train.get_checkpoint_state(MODEL_SAVE_PATH)
+			if ckpt and ckpt.model_checkpoint_path:
+				saver.restore(sess, ckpt.model_checkpoint_path)
+				xfeed = np.zeros([1,28,28,1])
+				prediction_feed = {x: xfeed}
+				pred = sess.run(prediction, feed_dict=prediction_feed)
+				yy = sess.run(y, feed_dict=prediction_feed)
+		print pred[0], yy[0][pred[0]]
+		return pred[0], yy[0][pred[0]]
 
-
-def main(argv,argv2):
-	if argv == 'train':
+def main(cmd,argv):
+	if cmd == 'train':
 		mnist = input_data.read_data_sets("../datasets/MNIST_data", one_hot=True)
-		train(mnist, argv2)
-	elif argv == 'eval':
+		train(mnist, argv)
+	elif cmd == 'eval':
 		mnist = input_data.read_data_sets("../datasets/MNIST_data", one_hot=True)
 		evaluate(mnist)
+	elif cmd == 'pred':
+		prediction(argv)
 	else:
-		print("train or eval")
+		print("train or eval or pred")
 
 if __name__ == '__main__':
-	if len(sys.argv) < 2:
-		print("train or eval")
-	
-	if sys.argv[1] == 'train':
-		steps = 10
-		if len(sys.argv) > 2:
-			steps = int(sys.argv[2])
-		main(sys.argv[1], steps)
-	else:
+	args = len(sys.argv)
+	if args < 2:
+		print("train or eval or pred")
+	elif args == 2:
 		main(sys.argv[1], None)
+	else:
+		main(sys.argv[1], sys.argv[2])
