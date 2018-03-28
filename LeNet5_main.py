@@ -136,8 +136,8 @@ def prediction(filename):
 				saver.restore(sess, ckpt.model_checkpoint_path)
 				xfeed = np.zeros([1,28,28,1])
 				prediction_feed = {x: xfeed}
-				pred = sess.run(prediction, feed_dict=prediction_feed)
 				yy = sess.run(y, feed_dict=prediction_feed)
+				pred = np.argmax(yy,1)
 		print pred[0], yy[0][pred[0]]
 		return pred[0], yy[0][pred[0]]
 
