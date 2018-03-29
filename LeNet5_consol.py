@@ -17,7 +17,7 @@ def main(cmd,argv):
 		mnist = input_data.read_data_sets("../datasets/MNIST_data", one_hot=True)
 		LeNet5_operate.evaluate(mnist)
 	elif cmd == 'pred':
-		LeNet5_operate.prediction(argv)
+		print LeNet5_operate.prediction(argv)
 	else:
 		print("train or eval or pred")
 

@@ -11,37 +11,54 @@ import LeNet5_operate
 path = None
 label_pic = None
 inum = None
+canvas = None
+buffpic = None
+buffcan = None
 
 def selectPath():
-	global path,label_pic,inum
+	global path,label_pic,inum,buffpic
+	
 	path_ = tkFileDialog.askopenfilename()
+	
 	path.set(path_)
 	im2 = Image.open(path_)
 	if im2 != None:
 		im2 = ImageTk.PhotoImage(im2)
 		label_pic.bm=im2
 		label_pic.configure(image=im2)
+		f = open(path_,'rb+')
+		f.seek(54)
+		buffpic = f.read(280*280*3)
+		f.close()
 		inum.delete(0,'end')
+		
 
 def writeNum():
-	global path,label_pic,inum
-	path_ = tkFileDialog.askopenfilename()
-	path.set(path_)
-	im2 = Image.open(path_)
-	if im2 != None:
-		im2 = ImageTk.PhotoImage(im2)
-		label_pic.bm=im2
-		label_pic.configure(image=im2)
-		inum.delete(0,'end')
+	global label_pic,inum
+	im2 = Image.open('./pic/white.bmp')
+	im2 = ImageTk.PhotoImage(im2)
+	label_pic.bm=im2
+	label_pic.configure(image=im2)
+	inum.delete(0,'end')
+	label_pic.place_forget()
+	canvas.place(x=5,y=0,width=280,height=280)
 
 def identifyNum():
-	global inum
-	r1, r2 = LeNet5_operate.prediction(path.get())
-	inum.delete(0,'end')
-	inum.insert(0,'%d 可信度%f'%(r1,r2))
+	global inum,buffpic
+	if buffpic != None:
+		r1, r2 = LeNet5_operate.prediction_fast(buffpic,shape='280X280X3')
+		inum.delete(0,'end')
+		inum.insert(0,'%d 可信度%f'%(r1,r2))
+	elif buffcan != None:
+		r1, r2 = LeNet5_operate.prediction_fast(buffcan, shape='280X280')
+		inum.delete(0,'end')
+		inum.insert(0,'%d 可信度%f'%(r1,r2))
+	else:
+		inum.delete(0,'end')
+		inum.insert(0,'没有图片供识别')
 
 def main():
-	global path,label_pic,inum
+	global path,label_pic,inum,canvas
 	LeNet5_operate.prediction_init()
 	
 	master = tk.Tk()
@@ -51,6 +68,9 @@ def main():
 	label_pic = tk.Label(master, image = im)
 	label_pic.bm = im
 	label_pic.place(x=5,y=0,width=280,height=280)
+
+	canvas = tk.Canvas(master, width=280, height=280)
+	canvas.create_line(0,10,10,10,fill='#476042')
 
 	path = tk.StringVar()
 	tk.Label(master,text = "目标路径:").place(x=5, y=300, width=60, height=20)

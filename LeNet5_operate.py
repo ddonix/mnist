@@ -18,9 +18,6 @@ sess = None
 
 # #### 1. 定义神经网络相关的参数
 
-# In[2]:
-
-
 BATCH_SIZE = 100
 LEARNING_RATE_BASE = 0.01
 LEARNING_RATE_DECAY = 0.99
@@ -31,9 +28,6 @@ MODEL_NAME = "LeNet5_model"
 
 
 # #### 2. 定义训练过程
-
-# In[3]:
-
 
 def train(mnist, training_steps):
     # 定义输出为4维矩阵的placeholder
@@ -121,6 +115,7 @@ def evaluate(mnist):
 			else:
 				print("no checkpoint")
 
+# #### 4. 定义预测初始化
 def prediction_init():
 	global x,y,g,sess
 	g = tf.Graph().as_default()
@@ -140,20 +135,29 @@ def prediction_init():
 		return True
 	return False
 
-def prediction_fast(filename):
+
+# #### 5. 定义快速预测
+def prediction_fast(buff, shape):
 	global x,y,g,sess
 	xfeed = np.zeros([1,28,28,1])
-	f = open(filename, 'rb+')
-	buf = f.read(235254)
-	f.close()
-	for ibase in np.arange(28):
-		for jbase in np.arange(28):
-			sum = 0
-			for ii in np.arange(10):
-				for jj in np.arange(10):
-					for kk in np.arange(3):
-						sum += ord(buf[54+(279-ibase*10-ii)*280*3+(jbase*10+jj)*3+kk])
-			xfeed[0][ibase][jbase][0] = 1-float(sum)/300/255
+	if shape == '280X280X3':
+		for ibase in np.arange(28):
+			for jbase in np.arange(28):
+				sum = 0
+				for ii in np.arange(10):
+					for jj in np.arange(10):
+						for kk in np.arange(3):
+							sum += ord(buff[(279-ibase*10-ii)*280*3+(jbase*10+jj)*3+kk])
+				xfeed[0][ibase][jbase][0] = 1-float(sum)/300/255
+	elif shape == '280X280':
+		for ibase in np.arange(28):
+			for jbase in np.arange(28):
+				sum = 0
+				for ii in np.arange(10):
+					for jj in np.arange(10):
+							sum += ord(buff[(279-ibase*10-ii)*280+(jbase*10+jj)])
+				xfeed[0][ibase][jbase][0] = 1-float(sum)/100/255
+
 	yy = sess.run(y, feed_dict={x: xfeed})
 	pred = np.argmax(yy,1)
 	t1 = yy[0][pred[0]]
@@ -163,12 +167,12 @@ def prediction_fast(filename):
 	t2 = yy[0][pred2[0]]
 		
 	if t2 <= 0:
-		print pred[0], 1.0
 		return pred[0], 1.0
 	else:
-		print pred[0], (t1-t2)/t1
 		return pred[0], (t1-t2)/t1
 
+
+# #### 6. 定义预测
 def prediction(filename):
     with tf.Graph().as_default() as g:
 		x = tf.placeholder(tf.float32, 
@@ -208,8 +212,6 @@ def prediction(filename):
 				t2 = yy[0][pred2[0]]
 		
 		if t2 <= 0:
-			print pred[0], 1.0
 			return pred[0], 1.0
 		else:
-			print pred[0], (t1-t2)/t1
 			return pred[0], (t1-t2)/t1
