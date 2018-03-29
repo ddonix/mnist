@@ -140,7 +140,7 @@ def prediction_init():
 def prediction_fast(buff, shape):
 	global x,y,g,sess
 	xfeed = np.zeros([1,28,28,1])
-	if shape == '280X280X3':
+	if shape == 'bmp':
 		for ibase in np.arange(28):
 			for jbase in np.arange(28):
 				sum = 0
@@ -155,8 +155,8 @@ def prediction_fast(buff, shape):
 				sum = 0
 				for ii in np.arange(10):
 					for jj in np.arange(10):
-							sum += ord(buff[(279-ibase*10-ii)*280+(jbase*10+jj)])
-				xfeed[0][ibase][jbase][0] = 1-float(sum)/100/255
+						sum += ord(buff[ibase*10+ii][jbase*10+jj])
+				xfeed[0][ibase][jbase][0] = float(sum)/100
 
 	yy = sess.run(y, feed_dict={x: xfeed})
 	pred = np.argmax(yy,1)
