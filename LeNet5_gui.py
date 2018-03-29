@@ -36,12 +36,20 @@ def selectPath():
 
 		canvas.place_forget()
 		buffcan = None
-		
+
+def mouse_press_event(evt):
+	#打印鼠标操作
+	print(evt.type)
+	canvas.create_rectangle(evt.x,evt.y,evt.x-10,evt.y-10,fill = 'black')	
+
+def mouse_release_event(evt):
+	#打印鼠标操作
+	print(evt.type)
+	canvas.create_rectangle(evt.x,evt.y,evt.x-10,evt.y-10,fill = 'red')	
 
 def writeNum():
 	global label_pic,inum,path
 	canvas.place(x=5,y=0,width=280,height=280)
-	
 	inum.delete(0,'end')
 	label_pic.place_forget()
 	buffpic = None
@@ -70,8 +78,9 @@ def main():
 	label_pic.place_forget()
 
 	canvas = tk.Canvas(master, width=280, height=280, bg='white')
-	canvas.create_line(0,10,10,10,fill='#ff0000')
 	canvas.place(x=5,y=0,width=280,height=280)
+	canvas.bind("<ButtonPress-1>",mouse_press_event)
+	canvas.bind("<ButtonRelease-1>",mouse_release_event)
 	buffcan = np.zeros([280,280], 'int8')
 
 	path = tk.StringVar()
