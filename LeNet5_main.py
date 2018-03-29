@@ -118,7 +118,7 @@ def evaluate(mnist):
 				print("no checkpoint")
 
 # In[5]:
-def prediction(filename):
+def prediction(mnist, filename):
     with tf.Graph().as_default() as g:
 		x = tf.placeholder(tf.float32, 
 				[1, 
@@ -135,7 +135,19 @@ def prediction(filename):
 			if ckpt and ckpt.model_checkpoint_path:
 				saver.restore(sess, ckpt.model_checkpoint_path)
 				xfeed = np.zeros([1,28,28,1])
+				f = open(filename, 'rb+')
+				buf = f.read(235254)
+				f.close()
+				for ibase in np.arange(28):
+					for jbase in np.arange(28):
+						sum = 0
+						for ii in np.arange(10):
+							for jj in np.arange(10):
+								for kk in np.arange(3):
+									sum += ord(buf[54+(279-ibase*10-ii)*280*3+(jbase*10+jj)*3+kk])
+						xfeed[0][ibase][jbase][0] = 1-float(sum)/300/255
 				prediction_feed = {x: xfeed}
+				print(xfeed[0])
 				yy = sess.run(y, feed_dict=prediction_feed)
 				pred = np.argmax(yy,1)
 		print pred[0], yy[0][pred[0]]
@@ -144,12 +156,13 @@ def prediction(filename):
 def main(cmd,argv):
 	if cmd == 'train':
 		mnist = input_data.read_data_sets("../datasets/MNIST_data", one_hot=True)
-		train(mnist, argv)
+		train(mnist,int(argv))
 	elif cmd == 'eval':
 		mnist = input_data.read_data_sets("../datasets/MNIST_data", one_hot=True)
 		evaluate(mnist)
 	elif cmd == 'pred':
-		prediction(argv)
+		mnist = input_data.read_data_sets("../datasets/MNIST_data", one_hot=True)
+		prediction(mnist, argv)
 	else:
 		print("train or eval or pred")
 
