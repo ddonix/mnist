@@ -15,9 +15,13 @@ inum = None
 canvas = None
 buffpic = None
 buffcan = None
+buffmnist = None
+
+#0:文件识别，1:手写识别鼠标松开,2:手写识别鼠标按下
+state = 1
 
 def selectPath():
-	global path,label_pic,inum,buffpic
+	global path,label_pic,inum,buffpic,state
 	
 	path_ = tkFileDialog.askopenfilename()
 	
@@ -36,38 +40,86 @@ def selectPath():
 
 		canvas.place_forget()
 		buffcan = None
+		state = 0
 
 def mouse_press_event(evt):
-	#打印鼠标操作
-	print(evt.type)
-	canvas.create_rectangle(evt.x,evt.y,evt.x-10,evt.y-10,fill = 'black')	
+	global canvas, state, buffcan
+	if state == 0:
+		return
+	state = 2
+	canvas.create_rectangle(evt.x+10,evt.y+10,evt.x-10,evt.y-10,fill = 'black')	
+	for i in np.arange(max(0,evt.y-13),min(280,evt.y+14)):
+		for j in np.arange(max(0,evt.x-13),min(280,evt.x+14)):
+			buffcan[i][j] = 1
 
 def mouse_release_event(evt):
-	#打印鼠标操作
-	print(evt.type)
-	canvas.create_rectangle(evt.x,evt.y,evt.x-10,evt.y-10,fill = 'red')	
+	global canvas, state, buffcan
+	if state == 0:
+		return
+	state = 1
+
+def mouse_movie_event(evt):
+	global canvas, state, buffcan
+	if state != 2:
+		return
+	canvas.create_rectangle(evt.x+10,evt.y+12,evt.x-10,evt.y-12,fill = 'black')	
+	for i in np.arange(max(0,evt.y-13),min(280,evt.y+14)):
+		for j in np.arange(max(0,evt.x-13),min(280,evt.x+14)):
+			buffcan[i][j] = 1
 
 def writeNum():
-	global label_pic,inum,path
+	global label_pic,inum,path,state,buffcan
+	canvas.delete('all')
 	canvas.place(x=5,y=0,width=280,height=280)
 	inum.delete(0,'end')
 	label_pic.place_forget()
-	buffpic = None
+	buffcan = np.zeros([280,280], 'int8')
+	buffmnist = None
 	path.set('')
+	state = 1
+
+def greyPic():
+	global buffcan
+	xfeed = np.zeros([28,28],dtype=float)
+	for ibase in np.arange(28):
+		for jbase in np.arange(28):
+			sum = 0
+			for ii in np.arange(10):
+				for jj in np.arange(10):
+					sum += buffcan[ibase*10+ii][jbase*10+jj]
+			xfeed[ibase][jbase] = float(sum)/100
+	
+	canvas.delete('all')
+	for ibase in np.arange(28):
+		for jbase in np.arange(28):
+			col = 255-int(xfeed[ibase][jbase]*255)
+			if col == 0:
+				col = '00'
+			elif col < 16:
+				col = '0'+hex(col)[2]
+			else:
+				col = hex(col)[2:3]
+			col = '#'+col+col+col
+			canvas.create_rectangle(jbase*10+10,ibase*10+10,jbase*10,ibase*10, outline=col,fill =col)
 
 def identifyNum():
-	global inum,buffpic
-	if buffpic != None:
-		r1, r2 = LeNet5_operate.prediction_fast(buffpic,shape='bmp')
+	global inum,buffpic,buffcan, state
+	if state == 0:
+		r1, r2, r3 = LeNet5_operate.prediction_fast(buffpic,shape='bmp')
 		inum.delete(0,'end')
-		inum.insert(0,'%d 可信度%f'%(r1,r2))
+		inum.insert(0,'%d 可信度%f 备选%d'%(r1,r2,r3))
 	else:
-		r1, r2 = LeNet5_operate.prediction_fast(buffcan, shape='280X280')
-		inum.delete(0,'end')
-		inum.insert(0,'%d 可信度%f'%(r1,r2))
+		if buffmnist != None:
+			r1, r2, r3 = LeNet5_operate.prediction_fast(buffmnist, shape='mnist')
+			inum.delete(0,'end')
+			inum.insert(0,'%d 可信度%f 备选%d'%(r1,r2,r3))
+		else:
+			r1, r2, r3 = LeNet5_operate.prediction_fast(buffcan, shape='280X280')
+			inum.delete(0,'end')
+			inum.insert(0,'%d 可信度%f 备选%d'%(r1,r2,r3))
 
 def main():
-	global path,label_pic,inum,canvas,buffcan
+	global path,label_pic,inum,canvas,buffcan,state
 	LeNet5_operate.prediction_init()
 	
 	master = tk.Tk()
@@ -81,7 +133,9 @@ def main():
 	canvas.place(x=5,y=0,width=280,height=280)
 	canvas.bind("<ButtonPress-1>",mouse_press_event)
 	canvas.bind("<ButtonRelease-1>",mouse_release_event)
+	canvas.bind("<Motion>",mouse_movie_event)
 	buffcan = np.zeros([280,280], 'int8')
+	state = 1
 
 	path = tk.StringVar()
 	tk.Label(master,text = "目标路径:").place(x=5, y=300, width=60, height=20)
@@ -89,6 +143,7 @@ def main():
 	tk.Button(master, text = "路径选择", command = selectPath).place(x=5,y=320, width=60, height=20)
 
 	tk.Button(master, text = "手写", command = writeNum).place(x=5,y=340, width=60, height=20)
+	tk.Button(master, text = "转为灰度", command = greyPic).place(x=75,y=340, width=60, height=20)
 	tk.Button(master, text = "识别数字", command = identifyNum).place(x=5,y=360, width=60, height=20)
 	inum = tk.Entry(master)
 	inum.place(x=65, y=360, width=200, height=20)

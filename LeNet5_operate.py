@@ -155,8 +155,12 @@ def prediction_fast(buff, shape):
 				sum = 0
 				for ii in np.arange(10):
 					for jj in np.arange(10):
-						sum += ord(buff[ibase*10+ii][jbase*10+jj])
+						sum += buff[ibase*10+ii][jbase*10+jj]
 				xfeed[0][ibase][jbase][0] = float(sum)/100
+	elif shape == 'mnist':
+		for ibase in np.arange(28):
+			for jbase in np.arange(28):
+				xfeed[0][ibase][jbase][0] = buff[ibase][jbase]
 
 	yy = sess.run(y, feed_dict={x: xfeed})
 	pred = np.argmax(yy,1)
@@ -167,9 +171,9 @@ def prediction_fast(buff, shape):
 	t2 = yy[0][pred2[0]]
 		
 	if t2 <= 0:
-		return pred[0], 1.0
+		return pred[0], 1.0, pred2[0]
 	else:
-		return pred[0], (t1-t2)/t1
+		return pred[0], (t1-t2)/t1, pred2[0]
 
 
 # #### 6. 定义预测
@@ -212,6 +216,6 @@ def prediction(filename):
 				t2 = yy[0][pred2[0]]
 		
 		if t2 <= 0:
-			return pred[0], 1.0
+			return pred[0], 1.0, pred2[0]
 		else:
-			return pred[0], (t1-t2)/t1
+			return pred[0], (t1-t2)/t1, pred2[0]
