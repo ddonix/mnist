@@ -23,6 +23,17 @@ def selectPath():
 		label_pic.configure(image=im2)
 		inum.delete(0,'end')
 
+def writeNum():
+	global path,label_pic,inum
+	path_ = tkFileDialog.askopenfilename()
+	path.set(path_)
+	im2 = Image.open(path_)
+	if im2 != None:
+		im2 = ImageTk.PhotoImage(im2)
+		label_pic.bm=im2
+		label_pic.configure(image=im2)
+		inum.delete(0,'end')
+
 def identifyNum():
 	global inum
 	r1, r2 = LeNet5_operate.prediction(path.get())
@@ -46,9 +57,10 @@ def main():
 	tk.Entry(master, textvariable = path).place(x=65, y=300, width=200, height=20)
 	tk.Button(master, text = "路径选择", command = selectPath).place(x=5,y=320, width=60, height=20)
 
-	tk.Button(master, text = "识别数字", command = identifyNum).place(x=5,y=340, width=60, height=20)
+	tk.Button(master, text = "手写", command = writeNum).place(x=5,y=340, width=60, height=20)
+	tk.Button(master, text = "识别数字", command = identifyNum).place(x=5,y=360, width=60, height=20)
 	inum = tk.Entry(master)
-	inum.place(x=65, y=340, width=200, height=20)
+	inum.place(x=65, y=360, width=200, height=20)
 
 	master.update_idletasks()
 	master.mainloop()
