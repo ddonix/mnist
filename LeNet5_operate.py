@@ -156,7 +156,18 @@ def prediction_fast(filename):
 			xfeed[0][ibase][jbase][0] = 1-float(sum)/300/255
 	yy = sess.run(y, feed_dict={x: xfeed})
 	pred = np.argmax(yy,1)
-	return pred[0], yy[0][pred[0]]
+	t1 = yy[0][pred[0]]
+				
+	yy[0][pred[0]] = 0
+	pred2 = np.argmax(yy,1)
+	t2 = yy[0][pred2[0]]
+		
+	if t2 <= 0:
+		print pred[0], 1.0
+		return pred[0], 1.0
+	else:
+		print pred[0], (t1-t2)/t1
+		return pred[0], (t1-t2)/t1
 
 def prediction(filename):
     with tf.Graph().as_default() as g:
@@ -188,6 +199,17 @@ def prediction(filename):
 						xfeed[0][ibase][jbase][0] = 1-float(sum)/300/255
 				prediction_feed = {x: xfeed}
 				yy = sess.run(y, feed_dict=prediction_feed)
+				
 				pred = np.argmax(yy,1)
-		print pred[0], yy[0]
-		return pred[0], yy[0][pred[0]]
+				t1 = yy[0][pred[0]]
+				
+				yy[0][pred[0]] = 0
+				pred2 = np.argmax(yy,1)
+				t2 = yy[0][pred2[0]]
+		
+		if t2 <= 0:
+			print pred[0], 1.0
+			return pred[0], 1.0
+		else:
+			print pred[0], (t1-t2)/t1
+			return pred[0], (t1-t2)/t1
