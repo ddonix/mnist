@@ -77,7 +77,7 @@ def writeNum():
 	inum.delete(0,'end')
 	tnum.delete(0,'end')
 	label_pic.place_forget()
-	buffcan = np.zeros([280,280], 'int8')
+	buffcan = np.zeros([280,280], 'uint8')
 	buffmnist = None
 	path.set('')
 	state = 1
@@ -90,20 +90,22 @@ def greyPic():
 		canvas.delete('all')
 		canvas.place(x=5,y=0,width=280,height=280)
 		
-		for ibase in np.arange(28):
-			for jbase in np.arange(28):
-				sum = 0
-				for ii in np.arange(10):
-					for jj in np.arange(10):
-						for kk in np.arange(3):
-							sum += ord(buffpic[(279-ibase*10-ii)*280*3+(jbase*10+jj)*3+kk])
-				buffmnist[ibase][jbase] = 1-float(sum)/300/255
+		bufftmp = np.zeros((235200),dtype='uint16')
+		for i in np.arange(235200):
+			bufftmp[i] = ord(buffpic[i])
+		
+		bufftmp = bufftmp.reshape((280,840))
+		xx = np.split(bufftmp,28,axis=0)
+		for ibase, xt in enumerate(xx):
+			yy = np.split(xt,28,axis=1)
+			for jbase,yt in enumerate(yy):
+				buffmnist[27-ibase][jbase] = 1-float(yt.sum())/300/255
 	elif state == 1 or state == 2:
 		xx = np.split(buffcan,28,axis=0)
-		for ibase in np.arange(28):
-			t = np.split(xx[ibase],28,axis=1)
-			for jbase in np.arange(28):
-				buffmnist[ibase][jbase] = float(t[jbase].sum())/100
+		for ibase, xt in enumerate(xx):
+			yy = np.split(xt,28,axis=1)
+			for jbase,yt in enumerate(yy):
+				buffmnist[ibase][jbase] = float(yt.sum())/100
 	else:
 		return
 	
@@ -161,7 +163,7 @@ def main():
 	canvas.bind("<ButtonPress-1>",mouse_press_event)
 	canvas.bind("<ButtonRelease-1>",mouse_release_event)
 	canvas.bind("<Motion>",mouse_movie_event)
-	buffcan = np.zeros([280,280], 'int8')
+	buffcan = np.zeros([280,280], 'uint8')
 	state = 1
 
 	path = tk.StringVar()
