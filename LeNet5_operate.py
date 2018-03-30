@@ -141,22 +141,21 @@ def prediction_fast(buff, shape):
 	global x,y,g,sess
 	xfeed = np.zeros([1,28,28,1])
 	if shape == 'bmp':
-		for ibase in np.arange(28):
-			for jbase in np.arange(28):
-				sum = 0
-				for ii in np.arange(10):
-					for jj in np.arange(10):
-						for kk in np.arange(3):
-							sum += ord(buff[(279-ibase*10-ii)*280*3+(jbase*10+jj)*3+kk])
-				xfeed[0][ibase][jbase][0] = 1-float(sum)/300/255
+		bufftmp = np.zeros((235200),dtype='uint8')
+		for i in np.arange(235200):
+			bufftmp[i] = ord(buff[i])
+		bufftmp = bufftmp.reshape((280,840))
+		xx = np.split(bufftmp,28,axis=0)
+		for ibase, xt in enumerate(xx):
+			yy = np.split(xt,28,axis=1)
+			for jbase,yt in enumerate(yy):
+				xfeed[0][27-ibase][jbase][0] = 1-float(yt.sum())/300/255
 	elif shape == '280X280':
-		for ibase in np.arange(28):
-			for jbase in np.arange(28):
-				sum = 0
-				for ii in np.arange(10):
-					for jj in np.arange(10):
-						sum += buff[ibase*10+ii][jbase*10+jj]
-				xfeed[0][ibase][jbase][0] = float(sum)/100
+		xx = np.split(buff,28,axis=0)
+		for ibase, xt in enumerate(xx):
+			yy = np.split(xt,28,axis=1)
+			for jbase,yt in enumerate(yy):
+				xfeed[0][ibase][jbase][0] = float(yt.sum())/100
 	elif shape == 'mnist':
 		for ibase in np.arange(28):
 			for jbase in np.arange(28):
@@ -197,14 +196,16 @@ def prediction(filename):
 				f = open(filename, 'rb+')
 				buf = f.read(235254)
 				f.close()
-				for ibase in np.arange(28):
-					for jbase in np.arange(28):
-						sum = 0
-						for ii in np.arange(10):
-							for jj in np.arange(10):
-								for kk in np.arange(3):
-									sum += ord(buf[54+(279-ibase*10-ii)*280*3+(jbase*10+jj)*3+kk])
-						xfeed[0][ibase][jbase][0] = 1-float(sum)/300/255
+				
+				bufftmp = np.zeros((235200),dtype='uint8')
+				for i in np.arange(235200):
+					bufftmp[i] = ord(buf[i])
+				bufftmp = bufftmp.reshape((280,840))
+				xxx = np.split(bufftmp,28,axis=0)
+				for ibase, xt in enumerate(xxx):
+					yyy = np.split(xt,28,axis=1)
+					for jbase,yt in enumerate(yyy):
+						xfeed[0][27-ibase][jbase][0] = 1-float(yt.sum())/300/255
 				prediction_feed = {x: xfeed}
 				yy = sess.run(y, feed_dict=prediction_feed)
 				

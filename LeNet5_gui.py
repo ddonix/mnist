@@ -90,7 +90,7 @@ def greyPic():
 		canvas.delete('all')
 		canvas.place(x=5,y=0,width=280,height=280)
 		
-		bufftmp = np.zeros((235200),dtype='uint16')
+		bufftmp = np.zeros((235200),dtype='uint8')
 		for i in np.arange(235200):
 			bufftmp[i] = ord(buffpic[i])
 		
