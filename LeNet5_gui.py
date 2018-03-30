@@ -154,12 +154,12 @@ def main():
 	state = 1
 
 	path = tk.StringVar()
-	tk.Label(master,text = "目标路径:").place(x=5, y=300, width=60, height=20)
+	tk.Label(master,text = "图片路径:").place(x=5, y=300, width=60, height=20)
 	tk.Entry(master, textvariable = path).place(x=65, y=300, width=200, height=20)
-	tk.Button(master, text = "路径选择", command = selectPath).place(x=5,y=320, width=60, height=20)
+	tk.Button(master, text = "选择图片", command = selectPath).place(x=5,y=320, width=60, height=20)
 
-	tk.Button(master, text = "手写", command = writeNum).place(x=5,y=340, width=60, height=20)
-	tk.Button(master, text = "查看MNIST灰度图", command = greyPic).place(x=75,y=340, width=100, height=20)
+	tk.Button(master, text = "清手写版", command = writeNum).place(x=5,y=340, width=60, height=20)
+	tk.Button(master, text = "转MNIST灰度图", command = greyPic).place(x=75,y=340, width=110, height=20)
 	tk.Button(master, text = "识别数字", command = identifyNum).place(x=5,y=360, width=60, height=20)
 	inum = tk.Entry(master)
 	inum.place(x=65, y=360, width=200, height=20)
