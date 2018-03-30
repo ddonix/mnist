@@ -79,20 +79,37 @@ def writeNum():
 	state = 1
 
 def greyPic():
-	global buffcan
-	xfeed = np.zeros([28,28],dtype=float)
-	for ibase in np.arange(28):
-		for jbase in np.arange(28):
-			sum = 0
-			for ii in np.arange(10):
-				for jj in np.arange(10):
-					sum += buffcan[ibase*10+ii][jbase*10+jj]
-			xfeed[ibase][jbase] = float(sum)/100
+	global buffcan,buffmnist,state
+	buffmnist = np.zeros([28,28],dtype=float)
+	if state == 0:
+		label_pic.place_forget()
+		canvas.delete('all')
+		canvas.place(x=5,y=0,width=280,height=280)
+		
+		for ibase in np.arange(28):
+			for jbase in np.arange(28):
+				sum = 0
+				for ii in np.arange(10):
+					for jj in np.arange(10):
+						for kk in np.arange(3):
+							sum += ord(buffpic[(279-ibase*10-ii)*280*3+(jbase*10+jj)*3+kk])
+				buffmnist[ibase][jbase] = 1-float(sum)/300/255
+	elif state == 1 or state == 2:
+		for ibase in np.arange(28):
+			for jbase in np.arange(28):
+				sum = 0
+				for ii in np.arange(10):
+					for jj in np.arange(10):
+						sum += buffcan[ibase*10+ii][jbase*10+jj]
+				buffmnist[ibase][jbase] = float(sum)/100
+	else:
+		return
 	
+	state = 3
 	canvas.delete('all')
 	for ibase in np.arange(28):
 		for jbase in np.arange(28):
-			col = 255-int(xfeed[ibase][jbase]*255)
+			col = 255-int(buffmnist[ibase][jbase]*255)
 			if col == 0:
 				col = '00'
 			elif col < 16:
@@ -108,15 +125,14 @@ def identifyNum():
 		r1, r2, r3 = LeNet5_operate.prediction_fast(buffpic,shape='bmp')
 		inum.delete(0,'end')
 		inum.insert(0,'%d 可信度%f 备选%d'%(r1,r2,r3))
+	elif state == 3:
+		r1, r2, r3 = LeNet5_operate.prediction_fast(buffmnist, shape='mnist')
+		inum.delete(0,'end')
+		inum.insert(0,'%d 可信度%f 备选%d'%(r1,r2,r3))
 	else:
-		if buffmnist != None:
-			r1, r2, r3 = LeNet5_operate.prediction_fast(buffmnist, shape='mnist')
-			inum.delete(0,'end')
-			inum.insert(0,'%d 可信度%f 备选%d'%(r1,r2,r3))
-		else:
-			r1, r2, r3 = LeNet5_operate.prediction_fast(buffcan, shape='280X280')
-			inum.delete(0,'end')
-			inum.insert(0,'%d 可信度%f 备选%d'%(r1,r2,r3))
+		r1, r2, r3 = LeNet5_operate.prediction_fast(buffcan, shape='280X280')
+		inum.delete(0,'end')
+		inum.insert(0,'%d 可信度%f 备选%d'%(r1,r2,r3))
 
 def main():
 	global path,label_pic,inum,canvas,buffcan,state
@@ -143,7 +159,7 @@ def main():
 	tk.Button(master, text = "路径选择", command = selectPath).place(x=5,y=320, width=60, height=20)
 
 	tk.Button(master, text = "手写", command = writeNum).place(x=5,y=340, width=60, height=20)
-	tk.Button(master, text = "转为灰度", command = greyPic).place(x=75,y=340, width=60, height=20)
+	tk.Button(master, text = "查看MNIST灰度图", command = greyPic).place(x=75,y=340, width=100, height=20)
 	tk.Button(master, text = "识别数字", command = identifyNum).place(x=5,y=360, width=60, height=20)
 	inum = tk.Entry(master)
 	inum.place(x=65, y=360, width=200, height=20)
