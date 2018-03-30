@@ -82,6 +82,9 @@ def writeNum():
 	path.set('')
 	state = 1
 
+def mouse_press_event_right(evt):
+	writeNum()
+
 def greyPic():
 	global buffcan,buffmnist,state
 	buffmnist = np.zeros([28,28],dtype=float)
@@ -163,6 +166,7 @@ def main():
 	canvas.bind("<ButtonPress-1>",mouse_press_event)
 	canvas.bind("<ButtonRelease-1>",mouse_release_event)
 	canvas.bind("<Motion>",mouse_movie_event)
+	master.bind("<ButtonPress-3>",mouse_press_event_right)
 	buffcan = np.zeros([280,280], 'uint8')
 	state = 1
 
